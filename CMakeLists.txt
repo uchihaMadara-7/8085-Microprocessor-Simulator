@@ -10,6 +10,7 @@ set(SOURCE_DIR src)
 set(SOURCE_FILES
     ${SOURCE_DIR}/8085_main.cpp
     ${SOURCE_DIR}/ui_builder.cpp
+    ${SOURCE_DIR}/view.cpp
 )
 
 add_executable(8085 ${SOURCE_FILES})

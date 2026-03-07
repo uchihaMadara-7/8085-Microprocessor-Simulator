@@ -6,7 +6,7 @@
  */
 
 /* project specific includes */
-#include "include/view_ui.hpp"
+#include "include/view.hpp"
 
 int main() {
     ViewUI view;
