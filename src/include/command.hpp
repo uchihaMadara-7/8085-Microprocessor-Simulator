@@ -31,6 +31,15 @@ enum class Parser {
 };
 
 // =============================================================================
+//                       Enum class for type of numbers/addresses
+// =============================================================================
+enum class NumberType {
+    Invalid,
+    Hex,
+    Integer,
+};
+
+// =============================================================================
 //                       Command Interface Class
 // =============================================================================
 class ICommand {
@@ -54,7 +63,7 @@ class ICommand {
         {"B", "C", "D", "E", "H", "L", "M", "A"};
 
  private:
-    static bool is_address(const std::string& str);
+    static NumberType is_address(const std::string& str);
     virtual void setup_opcode_table() = 0;
     virtual uint8_t lookup_opcode();
     virtual std::vector<uint8_t> get_operand_codes();

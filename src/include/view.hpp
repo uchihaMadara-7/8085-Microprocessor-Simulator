@@ -18,6 +18,9 @@
 /* project specific c++ includes */
 #include "ui_builder.hpp"
 
+// =============================================================================
+//                       ViewState: data-structure for changes in view
+// =============================================================================
 struct ViewState {
     std::vector<uint8_t> machine_code;
     uint16_t address;

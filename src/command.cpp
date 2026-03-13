@@ -76,18 +76,18 @@ void ICommand::parse(Parser parser) {
     update_machine_code();
 }
 
-bool ICommand::is_address(const std::string& str) {
+NumberType ICommand::is_address(const std::string& str) {
     static const std::regex hex_regex(R"(^0[xX][0-9a-fA-F]+$)");
     static const std::regex num_regex(R"(^[0-9]+$)");
-    if (std::regex_match(str, hex_regex)) return true;
-    if (std::regex_match(str, num_regex)) return true;
-    return false;
+    if (std::regex_match(str, hex_regex)) return NumberType::Hex;
+    if (std::regex_match(str, num_regex)) return NumberType::Integer;
+    return NumberType::Invalid;
 }
 
 uint8_t ICommand::lookup_opcode() {
     std::string key{};
     for (auto& operand : _operands) {
-        if (ICommand::is_address(operand)) continue;
+        if (ICommand::is_address(operand) != NumberType::Invalid) continue;
         key += operand;
     }
     return _opcode_db.at(key);
@@ -96,11 +96,25 @@ uint8_t ICommand::lookup_opcode() {
 std::vector<uint8_t> ICommand::get_operand_codes() {
     std::vector<uint8_t> operand_code;
     for (auto& operand : _operands) {
-        if (!ICommand::is_address(operand)) continue;
-        // // check if address/value is integer or hex
-        // // if integer, convert to hex
-        // // if address, break into two values 0xFFFF to 0xFF 0xFF
-        operand_code.push_back(std::stoi(operand, nullptr, 16));
+        NumberType type = ICommand::is_address(operand);
+        switch (type) {
+            case NumberType::Invalid:
+                break;
+            case NumberType::Integer:
+                operand_code.push_back(std::stoi(operand, nullptr, 10));
+                break;
+            case NumberType::Hex:
+                if (operand.size() == 6) {
+                    // WARNING: the code inside the block is not tested
+                    const std::string first_half = operand.substr(0, 4);
+                    operand_code.push_back(std::stoi(first_half, nullptr, 16));
+                    const std::string second_half = "0x" + operand.substr(4);
+                    operand_code.push_back(std::stoi(second_half, nullptr, 16));
+                } else {
+                    operand_code.push_back(std::stoi(operand, nullptr, 16));
+                }
+                break;
+        }
     }
 
     return operand_code;
