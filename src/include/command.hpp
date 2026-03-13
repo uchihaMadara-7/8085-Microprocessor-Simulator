@@ -41,6 +41,8 @@ class ICommand {
 
     std::vector<std::string> _operands;
     std::unordered_map<std::string, int> _opcode_db;
+    const std::vector<std::string> _registers =
+        {"B", "C", "D", "E", "H", "L", "M", "A"};
 
  private:
     virtual uint8_t lookup_opcode();
@@ -66,4 +68,17 @@ class ADD : public ICommand {
     void setup_opcode_table() final;
 };
 
+// =============================================================================
+//                       MOV Class for MOV instruction
+// =============================================================================
+class MOV : public ICommand {
+ public:
+    explicit MOV(const std::string& instruction);
+
+    bool execute() final;
+    void undo() final;
+
+ private:
+    void setup_opcode_table() final;
+};
 #endif  // __COMMAND_HPP__

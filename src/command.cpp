@@ -25,6 +25,8 @@ std::shared_ptr<ICommand> ICommand::get_command(std::string instruction) {
     std::string command = utils::get_first_word(instruction);
     if (command == "ADD") {
         return std::make_shared<ADD>(instruction);
+    } else if (command == "MOV") {
+        return std::make_shared<MOV>(instruction);
     }
     throw std::invalid_argument("invalid command");
 }
@@ -34,13 +36,22 @@ uint8_t ICommand::get_opcode() {
 }
 
 void ICommand::parse(Parser parser) {
+    size_t start_pos;
+    std::string operand;
     switch (parser) {
         case Parser::NoOperand:
             break;
         case Parser::SingleOperand:
-            size_t start_pos = __instruction.find(' ') + 1;
-            std::string operand = __instruction.substr(start_pos);
-            // set_opcode(128 + (uint8_t)(operand[0]-'A'));
+            start_pos = __instruction.find(' ') + 1;
+            operand = __instruction.substr(start_pos, 1);
+            _operands.push_back(operand);
+            break;
+        case Parser::DualOperand:
+            start_pos = __instruction.find(' ') + 1;
+            operand = __instruction.substr(start_pos, 1);
+            _operands.push_back(operand);
+            start_pos = __instruction.find(',') + 1;
+            operand = utils::normalize_string(__instruction.substr(start_pos));
             _operands.push_back(operand);
             break;
     }
@@ -83,14 +94,38 @@ void ADD::undo() {
 }
 
 void ADD::setup_opcode_table() {
-    _opcode_db = {
-        {"B", 0x80},
-        {"C", 0x81},
-        {"D", 0x82},
-        {"E", 0x83},
-        {"H", 0x84},
-        {"L", 0x85},
-        {"M", 0x86},
-        {"A", 0x87},
-    };
+    uint8_t current_opcode = 0x80;
+    for (auto &first_register : _registers) {
+        _opcode_db[first_register] = current_opcode++;
+    }
+}
+
+// =============================================================================
+//                       MOV Impl
+// =============================================================================
+MOV::MOV(const std::string& instruction) : ICommand(instruction) {
+    parse(Parser::DualOperand);
+}
+
+bool MOV::execute() {
+    return true;
+}
+
+void MOV::undo() {
+}
+
+void MOV::setup_opcode_table() {
+    uint8_t current_opcode = 0x40;
+    for (auto &first_register : _registers) {
+        for (auto &second_register : _registers) {
+            const std::string key = first_register + second_register;
+            _opcode_db[key] = current_opcode++;
+        }
+    }
+    current_opcode = 0x77;
+    _opcode_db["MA"] = current_opcode++;
+    for (auto &second_register : _registers) {
+        const std::string key = "A" + second_register;
+        _opcode_db[key] = current_opcode++;
+    }
 }
