@@ -7,6 +7,7 @@
 
 /* standard c++ includes */
 #include <cctype>
+#include <cstdint>
 #include <memory>
 #include <string>
 
@@ -51,8 +52,13 @@ void AppController::handle_special_keys(int ch) {
 void AppController::handle_enter() {
     std::string instruction = __view.editor->get_line();
     std::shared_ptr<ICommand> cmd = ICommand::get_command(instruction);
+    cmd->set_address(next_address());
     __source_code.push_back(cmd);
-    __view.update(cmd->get_opcode());
+    ViewState state = {
+        .machine_code = cmd->get_machine_code(),
+        .address = cmd->get_address(),
+    };
+    __view.update(state);
 }
 
 void AppController::handle_backspace() {
@@ -64,6 +70,14 @@ void AppController::handle_backspace() {
         return;
     }
     __view.editor->delete_last_char();
+}
+
+uint16_t AppController::next_address() {
+    if (__source_code.empty()) return 0;
+    auto last = __source_code.back();
+    const uint16_t current_addr = last->get_address();
+    const uint16_t next_addr = current_addr + last->get_machine_code().size();
+    return next_addr;
 }
 
 bool AppController::valid_character(int ch) {

@@ -9,12 +9,19 @@
 #define __VIEW_HPP__
 
 /* standard c++ includes */
+#include <cstdint>
 #include <memory>
 #include <string>
+#include <vector>
 #include <ncurses_facade.hpp>
 
 /* project specific c++ includes */
 #include "ui_builder.hpp"
+
+struct ViewState {
+    std::vector<uint8_t> machine_code;
+    uint16_t address;
+};
 
 // =============================================================================
 //                       Edtior Class for View
@@ -50,7 +57,7 @@ class ViewUI {
     void add_flags();
     int read();
     void update(int ch);
-    void update(const uint8_t opcode);
+    void update(const ViewState& state);
 
  public:
     std::shared_ptr<Editor> editor;

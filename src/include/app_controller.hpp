@@ -8,6 +8,10 @@
 #ifndef __APP_CONTROLLER_HPP__
 #define __APP_CONTROLLER_HPP__
 
+/* standard c++ includes */
+#include <cstdint>
+#include <vector>
+
 /* project specific c++ includes */
 #include "view.hpp"
 #include "command.hpp"
@@ -23,6 +27,7 @@ class AppController {
     void handle_special_keys(int ch);
     void handle_enter();
     void handle_backspace();
+    uint16_t next_address();
     bool valid_character(int ch);
 
  private:

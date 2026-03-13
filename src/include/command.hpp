@@ -40,7 +40,10 @@ class ICommand {
     static std::shared_ptr<ICommand> get_command(std::string instruction);
     virtual bool execute() = 0;
     virtual void undo() = 0;
+    uint16_t get_address();
+    std::vector<uint8_t> get_machine_code();
     uint8_t get_opcode();
+    void set_address(uint16_t address);
 
  protected:
     void parse(Parser parser);
@@ -51,12 +54,15 @@ class ICommand {
         {"B", "C", "D", "E", "H", "L", "M", "A"};
 
  private:
-    virtual uint8_t lookup_opcode();
-    virtual uint8_t resolve_opcode(const std::string &key);
     virtual void setup_opcode_table() = 0;
+    virtual uint8_t lookup_opcode();
+    virtual std::vector<uint8_t> get_operand_codes();
     void set_opcode(const uint8_t opcode);
+    void update_machine_code();
 
+    std::uint16_t __address;
     std::string __instruction;
+    std::vector<uint8_t> __machine_code;
     uint8_t __opcode;
 };
 

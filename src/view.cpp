@@ -119,8 +119,15 @@ void ViewUI::add_flags() {
         .build<FlagsUI>();
 }
 
-void ViewUI::update(uint8_t opcode) {
+void ViewUI::update(const ViewState& state) {
     const size_t current_line = editor->get_line_number();
-    __machine_code_ui->print(current_line, 2, utils::to_hex(opcode, 2));
+    // __machine_code_ui->print(current_line, 2, utils::to_hex(opcode, 2));
+    size_t current_pos = 2;
+    for (auto& machine_code : state.machine_code) {
+        const std::string code = utils::to_hex(machine_code, 2);
+        __machine_code_ui->print(current_line, current_pos, code);
+        current_pos += code.size() + 1;
+    }
+    __address_ui->print(current_line, 2, utils::to_hex(state.address, 4));
     editor->move_to_next_line();
 }
