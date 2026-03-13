@@ -17,9 +17,11 @@
 namespace utils {
 
 std::string normalize_string(std::string str) {
-    str = std::regex_replace(str, std::regex("^\\s+"), "");  // trim leading
-    str = std::regex_replace(str, std::regex("\\s+"), " ");  // collapse spaces
-    str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);      // trim trailing
+    str = std::regex_replace(str, std::regex("^\\s+"), "");   // trim leading
+    str = std::regex_replace(str, std::regex("\\s+"), " ");   // collapse spaces
+    str = std::regex_replace(str, std::regex("\\s+,"), ",");  // space before ,
+    str = std::regex_replace(str, std::regex(",\\s+"), ",");  // space after ,
+    str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);       // trim trailing
     return str;
 }
 

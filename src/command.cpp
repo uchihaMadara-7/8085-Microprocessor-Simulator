@@ -36,22 +36,22 @@ uint8_t ICommand::get_opcode() {
 }
 
 void ICommand::parse(Parser parser) {
-    size_t start_pos;
+    size_t start_pos = __instruction.find(INSTR_SEPARATOR) + 1;
+    std::string operand_part = __instruction.substr(start_pos);
+    size_t length;
     std::string operand;
     switch (parser) {
         case Parser::NoOperand:
             break;
         case Parser::SingleOperand:
-            start_pos = __instruction.find(' ') + 1;
-            operand = __instruction.substr(start_pos, 1);
-            _operands.push_back(operand);
+            _operands.push_back(operand_part);
             break;
         case Parser::DualOperand:
-            start_pos = __instruction.find(' ') + 1;
-            operand = __instruction.substr(start_pos, 1);
+            length = operand_part.find(OPERAND_SEPARATOR);
+            operand = operand_part.substr(0, length);
             _operands.push_back(operand);
-            start_pos = __instruction.find(',') + 1;
-            operand = utils::normalize_string(__instruction.substr(start_pos));
+            start_pos = length + 1;
+            operand = utils::normalize_string(operand_part.substr(start_pos));
             _operands.push_back(operand);
             break;
     }

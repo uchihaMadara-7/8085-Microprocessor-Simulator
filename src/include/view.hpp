@@ -10,8 +10,8 @@
 
 /* standard c++ includes */
 #include <memory>
-#include <ncurses_facade.hpp>
 #include <string>
+#include <ncurses_facade.hpp>
 
 /* project specific c++ includes */
 #include "ui_builder.hpp"
